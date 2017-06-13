@@ -5,6 +5,23 @@ import numpy as np
 import copy
 import random
 
+
+class rmsd():
+	pdb1 = None #Reference structure; .pdb file 
+	pdb2 = None #Structure to be compared; .pdb file
+	sm = None #Simulated Annealing class starter
+	bestSolution = None #Best RMSD
+
+	def __init__(self,file1,file2, parameter):
+		self.pdb1 = PDB_read(file1) #Opens the first file as reference
+		self.pdb2 = PDB_read(file2) #Opens the second file to be the one compared
+		self.sm = SimAnne(6,[-100.0,-100.0,-100.0,0.0,0.0,0.0],[100.0,100.0,100.0,360.0,360.0,360.0]) #Dimension, translocation ranges, rotation ranges
+		self.parameter = parameter #Defines wich structure part will be used (AlphaChain,AllAtoms,Backbone)
+		self.bestSolution = self.calcRMSD() 
+
+
+
+
 def aligner (transRot, atomList):
 	xRotation = np.matrix([[1.0,0.0,0.0],[0,math.cos(math.radians(transRot[3])),(-math.sin(math.radians(transRot[3])))],[0,math.sin(math.radians(transRot[3])),math.cos(math.radians(transRot[3]))]])
 	yRotation = np.matrix([[math.cos(math.radians(transRot[4])),0.0,math.sin(math.radians(transRot[4]))],[0.0,1.0,0.0],[(-math.sin(math.radians(transRot[4]))),0.0,math.cos(math.radians(transRot[4]))]])
@@ -29,16 +46,7 @@ def rmsd (cordRef, cordPDB, TransRot):
 	rm = rm/float(len(cordRef))
 	return rm
 
-#reference = raw_input("Reference input: ")
-#pdb = raw_input("PDB file: ")
 
-ref = PDB_read("reference.pdb").getCoord()
-pdbComp = PDB_read("1ACW-02.pdb").getCoord()
-
-
-simu_ann = SimAnne(6,[-100.0,-100.0,-100.0,0.0,0.0,0.0],[100.0,100.0,100.0,360.0,360.0,360.0])
-
-simu_ann.solution = map(float,simu_ann.solution)
 
 s0 = rmsd(ref,pdbComp,simu_ann.solution)
 
