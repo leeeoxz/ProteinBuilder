@@ -1,6 +1,6 @@
 from ProteinBuilder import ProteinBuilder as buildProt
 
-seq = "VSCEDCPEHCSTQKAQAKCDNDKCVCEPI"
+seq = raw_input("Sequence: ")
 
 builder = buildProt(seq)
 
