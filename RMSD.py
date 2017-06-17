@@ -7,22 +7,36 @@ import random
 
 
 class rmsd():
-	pdb1 = None #Reference structure; .pdb file 
+	pdb1 = None #Reference structure; .pdb file
 	pdb2 = None #Structure to be compared; .pdb file
 	sm = None #Simulated Annealing class starter
 	bestSolution = None #Best RMSD
 	transRot = None #Translational and rotational vector
 
 	def __init__(self,file1,file2, parameter):
-		self.pdb1 = PDB_read(file1) #Opens the first file as reference
-		self.pdb2 = PDB_read(file2) #Opens the second file to be the one compared
+		self.pdb1 = PDB_read.getAtom(PDB_read(file1),PDB_read(file1).atomList) #Opens the first file as reference
+		self.pdb2 = PDB_read.getAtom(PDB_read(file2)) #Opens the second file to be the one compared
+		self.start1 = self.hasChain(self.pdb1[0]) #set where the coordinates starts
+		self.start2 = self.hasChain(self.pdb2[0]) #set where the coordinates starts
 		self.sm = SimAnne(6,[-100.0,-100.0,-100.0,0.0,0.0,0.0],[100.0,100.0,100.0,360.0,360.0,360.0]) #Dimension, translocation ranges, rotation ranges
 		self.parameter = parameter #Defines wich structure part will be used (AlphaChain,AllAtoms,Backbone)
 		self.transRot = self.sm.create_solution()
-		
+
+	def hasChain(self,atom):
+		try:
+			int(atom[4])
+			return 5
+		except ValueError:
+			return 6
+
+	def matchAtoms(self):
+		#its gonna change the second pbd, in order to compare the same atoms#
+		aux = []
+		for x in xrange(len(self.pdb1)):
+			if self.pdb1[x] == None:
+				pass
 
 
-	
 	def Rotate(self, transRot,atomList):
 		#rotate around x axys
 		xRotation = np.matrix([[1.0,0.0,0.0],[0,math.cos(math.radians(transRot[3])),(-math.sin(math.radians(transRot[3])))],[0,math.sin(math.radians(transRot[3])),math.cos(math.radians(transRot[3]))]])
@@ -38,12 +52,13 @@ class rmsd():
 		#Transform the translational factor to a matrix, due to math lib functions
 		transMatrix=np.matrix([transRot[0:3]]*len(atomList))
 		#translocation:
+		print (atomList)
 		newAtom = atomList + transMatrix
 		return newAtom
 
 	def setRMSD (self,cordRef, cordPDB, TransRot):
-		aligned = Translate(TransRot,cordPDB)
-		aligned = Rotate(aligned,cordPDB)
+		aligned = self.Translate(TransRot,cordPDB)
+		aligned = self.Rotate(aligned,cordPDB)
 		rm = aligned - cordRef
 		rm = np.power(rm,2)
 		rm = np.sum(rm)

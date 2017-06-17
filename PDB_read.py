@@ -1,4 +1,6 @@
 import copy
+
+
 class PDB_read:
 	"""docstring for ClassName"""
 	atom = "ATOM"
@@ -59,7 +61,7 @@ class PDB_read:
 				line = self.transforInt(line)
 				self.atomList.append(line)
 			elif self.endTag in line[0:3]:
-				break 
+				break
 
 	def isNumber(self, value):
 		try:
@@ -84,7 +86,9 @@ class PDB_read:
 	def setCoord (self, atoms):
 		self.coordinates =[]
 		for lis in atoms:
+			print atoms
 			for x,item in enumerate(lis):
+				print item,x
 				if "." in item:
 					atm = []
 					atm.extend([float(lis[x]),float(lis[x+1]),float(lis[x+2])])
@@ -129,4 +133,3 @@ class PDB_read:
 
 	def getAA(self):
 		return copy.deepcopy(self.aaList)
-
