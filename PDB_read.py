@@ -4,7 +4,7 @@ import copy
 class PDB_read:
 	"""docstring for ClassName"""
 	atom = "ATOM"
-	alphaC = "CA"
+	alphaC = ["CA"]
 	carb = ["C"]
 	nitro = ["N"]
 	endTag = "TER"
@@ -80,20 +80,18 @@ class PDB_read:
 	def setAlpha(self):
 		self.alphaChain = []
 		for line in self.atomList:
-			if self.alphaC in line[2]:
+			if self.alphaC[0] in line[2]:
 				self.alphaChain.append(line)
 
 	def setCoord (self, atoms):
+		try: #if havent chain letter
+			int(atoms[0][4])
+			start = 5
+		except ValueError: #if pdb have the chain letter
+			start = 6
 		self.coordinates =[]
 		for lis in atoms:
-			print atoms
-			for x,item in enumerate(lis):
-				print item,x
-				if "." in item:
-					atm = []
-					atm.extend([float(lis[x]),float(lis[x+1]),float(lis[x+2])])
-					self.coordinates.append(atm)
-					break
+			self.coordinates.append(lis[start:start+3])
 
 	def setcChain(self):
 		self.cChain = []

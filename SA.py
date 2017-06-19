@@ -27,7 +27,7 @@ class SimAnne:
 	def create_solution(self):
 		sol = []
 		for d in xrange(self.dimension):
-			sol.append(str(random.uniform(self.lb[d], self.ub[d]))) #Creates a solution with dimension components, ranging between bounderies
+			sol.append(random.uniform(self.lb[d], self.ub[d])) #Creates a solution with dimension components, ranging between bounderies
 		return sol
 
 	def getProbability (self, Ene1, Ene2, temperature):

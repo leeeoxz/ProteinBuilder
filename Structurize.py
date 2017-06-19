@@ -1,12 +1,16 @@
+# Leonardo Santos #
+# June 2017 #
+
+# From an amino acid's sequence, this program constructs a pdb file with the sequence's structure #
+# This program is not focused on trying to set the dihedral angles, it's fuction is only to put the amino acids 3D structure in sequence#
+
 from ProteinBuilder import ProteinBuilder as buildProt
 
-seq = raw_input("Sequence: ")
+seq = raw_input("Sequence: ") #Gets the aminoacids sequence
 
-builder = buildProt(seq)
+structure = builder.getStructure(buildProt(seq)) #Creates a structure vector
 
-structure = builder.getStructure()
-
-file = open(seq+".pdb","w") #raw_input("Output file (without .pdb): ")
+file = open(seq+".pdb","w") #Opens the output file
 
 for aa in structure:
 	for atom in aa:

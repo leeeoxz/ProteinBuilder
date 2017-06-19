@@ -1,6 +1,11 @@
 from PDB_read import PDB_read as pdbr
 from Rotational import getAngle as angle
 import numpy as np
+# Leonardo Santos #
+# June 2017 #
+
+# Creates a .txt file with the dihedral angles and plost a Ramachandran's plot #
+
 import matplotlib.pyplot as plt
 import os
 
