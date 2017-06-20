@@ -32,6 +32,7 @@ class PDB_read:
 		self.setcChain()
 		self.setnChain()
 		self.setAA()
+		self.setAtomsAA()
 
 	def transforInt(self, atom): #transform coordinates and position into numbers
 		if self.isNumber(atom[4]):
@@ -110,6 +111,20 @@ class PDB_read:
 			if line[2] in self.nitro:
 				self.nChain.append(line)
 
+	def setAtomsAA(self):
+		self.atomsAA = []
+		if self.isNumber(self.atomList[0][4]):
+			index = 4
+		else:
+			index = 5
+		for i in xrange(len(self.aaList)):
+			aa = []
+			for atom in self.atomList:
+				if atom[index] == i+1:
+					aa.append(atom)
+			self.atomsAA.append(aa)
+
+
 	def getAtom(self):
 		return copy.deepcopy(self.atomList)
 
@@ -131,3 +146,6 @@ class PDB_read:
 
 	def getAA(self):
 		return copy.deepcopy(self.aaList)
+
+	def getAtomsAA(self):
+		return copy.deepcopy(self.atomsAA)

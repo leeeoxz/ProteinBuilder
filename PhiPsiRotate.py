@@ -11,17 +11,8 @@ import numpy as np
 import copy
 import random
 
-atoms1 = PDB_read("1plx.pdb").getAtom() # GET THE INFORMATIONS OF ALL ATOMS AS A LIST
-atoms2 = PDB_read("YGGFM.pdb").getAtom() # GET THE INFORMATIONS OF ALL ATOMS AS A LIST
-coord1 = PDB_read("1plx.pdb").getCoord(atoms1) # GET THE COORDENATES OF ALL ATOMS
-coord2 = PDB_read("YGGFM.pdb").getCoord(atoms2) # GET THE COORDENATES OF ALL ATOMS
-
-rms = rmsd(coord1,coord2,"backbone") 
-
-tam = (len(PDB_read("YGGFM.pdb").getAA())*2)-2 #GETS THE NUMBER OF AMINO ACIDS
-
-sm = SimAnne(tam,[0.0]*tam,[360.0]*tam) # STARTS THE METAHEURISTICS
-
+atomsN =["N","H1","H2","H3"]
+atomsCO = ["C","O"]
 
 def rotate (angle, pos): #ROTATES DE COORDINATES
 	xRotation = np.matrix([[1.0,0.0,0.0],[0,math.cos(math.radians(angle)),(-math.sin(math.radians(angle)))],[0,math.sin(math.radians(angle)),math.cos(math.radians(angle))]])
@@ -33,16 +24,37 @@ def rotate (angle, pos): #ROTATES DE COORDINATES
 	newAtom = pos * Rotation
 	return newAtom
 
-def setStart(value):
-	try:
-		int(value[4])
-		return 5
+def psi(structure,angle):
 
-	except ValueError:
-		return 6
+	for x,aa in enumerate(structure):
+		if x == 0:
+			for atom in aa:
+				print atom
+				if atom[2] in atomsCO:
+					print atom
+					atom[5:8] = rotate(angle, atom[5:8])
+					print atom
 
-start = setStart(atoms2[0])
+# TEM QUE MANDAR TODO O ATOMO, NAO SO AS COORDENADAS FUCK #
 
-for x,atom in enumerate(atoms2):
-	if x == 0 : 
-		pass		
+file1=PDB_read("YGGFM.pdb") 
+
+atoms1 = file1.getAtomsAA() # GET THE INFORMATIONS OF ALL ATOMS AS A LIST
+atoms2 = PDB_read("1plx.pdb").getAtomsAA() # GET THE INFORMATIONS OF ALL ATOMS AS A LIST
+coordAA1 =[]
+coordAA2 =[]
+for i in xrange(len(atoms1)):
+	coordAA1.append(file1.getCoord(atoms1[i]))
+for i in xrange(len(atoms2)):
+	coordAA2.append(PDB_read("1plx.pdb").getCoord(atoms2[i]))
+
+aaNuber = len(coordAA1) #GETS THE NUMBER OF AMINO ACIDS
+tam = (aaNuber*2)-2 #SET THE NUMBERS OF ANGLES 
+
+
+sm = SimAnne(tam,[0.0]*tam,[360.0]*tam) # STARTS THE METAHEURISTICS
+
+angles = sm.create_solution()
+for x,aa in enumerate(coordAA1):
+	if x == 0:
+		psi(coordAA1,angles[0])
