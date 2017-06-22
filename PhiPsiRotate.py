@@ -97,7 +97,7 @@ for x,aa in enumerate(atoms1):
 		atoms1 = atoms1[:x]+(psi(atoms1[x:],angles[x][1]))
 
 print atoms1
-file = open("testo.pdb","w") #Opens the output file
+file = open("1PLX-F.pdb","w") #Opens the output file
 
 for aa in atoms1:
 	for atom in aa:

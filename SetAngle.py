@@ -1,15 +1,15 @@
-from PDB_read import PDB_read as pdbr
-from Rotational import getAngle as angle
-import numpy as np
 # Leonardo Santos #
 # June 2017 #
 
+from PDB_read import PDB_read as pdbr
+from Rotational import getAngle as angle
+import numpy as np
 # Creates a .txt file with the dihedral angles and plost a Ramachandran's plot #
 
 import matplotlib.pyplot as plt
 import os
 
-name = "YGGFM.pdb"#raw_input("File name: ")
+name = "YGGFM.pdb" #raw_input("File name: ")
 f = pdbr(name)
 ca = f.getAlpha() #gets all Alpha Carbon
 n = f.getN() #Gets the N from backbone
