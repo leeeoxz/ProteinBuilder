@@ -7,7 +7,11 @@ import math
 class ProteinBuilder():
 	aminoacidDict = None
 	carbTAG = ["OC","HOC","HO","HC"]
-	hTAG = ["1H","H"]
+	hTAG = ["2H","H"]
+	angleH = ["1H"]
+	alphaC = ["CA"]
+	nitro = ["N"]
+	cabTAG = ["C"]
 	seq = None
 	proteinStruct = None #array of amino acids, which are arrays of atoms
 	seqSize = None #int value representing the len of the sequence
@@ -18,7 +22,7 @@ class ProteinBuilder():
 		self.proteinStruct = []
 		self.setStructure()
 		self.seqSize = len(self.proteinStruct)
-		self.setAngle()
+		#self.setAngle()
 
 
 	def removeOH(self,last):
@@ -49,14 +53,50 @@ class ProteinBuilder():
 
 	def addEnd (self,structure, aa):
 		dist= self.getDist(structure[-1],aa) #gets a list (number of next atom, number of next amino acid, x distance,y distance,z distance)
+		for x,atom in enumerate(structure[-1]):
+			if atom[2] in self.cabTAG:
+				paC = atom[5:8]
 		structure[-1] = self.removeOH(structure[-1])
 		aa = self.removeH(aa)
 		cont = 1
-		for atom in aa:
+		for x,atom in enumerate(aa):
 			atom[4] = dist[0] #set the new position of the aa in sequence
 			atom[5] = round(atom[5] + dist[1],3) #translocate the aminoacid on x axis
 			atom[6] = round(atom[6] + dist[2],3) #translocate the aminoacid on y axis
 			atom[7] = round(atom[7] + dist[3],3) #translocate the aminoacid on z axis
+			if atom[2] in self.angleH: #get the coordinates of H to rotate
+				H = x
+				ppH = atom[5:8]
+			elif atom[2] in self.alphaC: #get the coordinates of H to rotate
+				CA = x
+				ppCA = atom[5:8]
+			elif atom[2] in self.nitro: #get the coordinates of H to rotate
+				ppN = atom[5:8]
+				N = x
+
+		angle = self.calcAngle3p(paC,ppN,ppH)
+		angH =  120 - angle[0] 
+		ortho_aux = np.ndarray.tolist(angle[1])[0]
+		ortho = []
+		for item in ortho_aux:
+			ortho.append(round(item))
+		aa[H][5:8] = self.rotate(ortho,math.radians(angH),ppH,paC,ppN,ppH)
+		
+		
+		angle = self.calcAngle3p(aa[H][5:8],ppN,ppCA)
+		angCA = 120- angle[0]
+		ortho_aux = np.ndarray.tolist(angle[1])[0]
+		ortho = []
+		for item in ortho_aux:
+			ortho.append(round(item))
+		aa[CA][5:8] = self.rotate(ortho,math.radians(angCA),aa[CA][5:8],paC,ppN,ppCA)
+		print self.calcAngle3p(aa[CA][5:8],ppN,paC)[0]	
+		
+
+		for x,atom in enumerate(aa[2:]):
+			if aa[x+2][2] not in self.angleH:
+				aa[x+2][5:8] =self.rotate(ortho,math.radians(angCA),aa[x+2][5:8],paC,ppN,ppCA)
+	
 		structure.append(aa)
 			
 	def setStructure(self):
@@ -71,42 +111,30 @@ class ProteinBuilder():
 				atom[1] = x
 				x = x +1
 
-	def rotate(self):
-		
+	def rotate(self,ortho,ang,atm,at,ct,ps):
+		cos = math.cos(ang)
+		sen = math.sin(ang)
+		tan = 1.0-cos
+		pos = np.array(atm) - np.array(ct)
+		rot = np.matrix([[cos+ortho[0]*ortho[0]*tan, ortho[0] * ortho[1] * tan - ortho[2] * sen, ortho[0] * ortho[2] * tan + ortho[1] * sen],[ortho[0] * ortho[1] * tan + ortho[2] * sen, cos + ortho[1] * ortho[1] * tan, ortho[1] * ortho[2] * tan - ortho[0] * sen], [ortho[2] * ortho[0] * tan - ortho[1] * sen, ortho[2] * ortho[1] * tan + ortho[0] * sen, cos + ortho[2] * ortho[2] * tan]])
+		new_pos = np.matrix.tolist(np.matrix(pos) * rot.transpose())[0]
+		new_pos = list(np.array(new_pos) + np.array(ct))
+		return new_pos
 
 	def calcAngle3p(self,ap,cp,pp):
 		ap_mt = np.matrix(ap)
 		cp_mt = np.matrix(cp)
 		pp_mt = np.matrix(pp)
 		v1 = ap_mt - cp_mt
-		v2 = cp_mt - pp_mt
+		v2 = pp_mt - cp_mt
 		v1n= v1/np.linalg.norm(v1)
 		v2n= v2/np.linalg.norm(v2)
 		res = np.sum(np.multiply(v1n,v2n))
-		return math.degrees(float(np.arccos(res)))
-
-	def setAngle(self):
-		for x,aa in enumerate(self.proteinStruct):
-			if (x!=(self.seqSize-1)): #first amino acid
-				for atom in aa:
-					if atom[2] == 'C': #only calculates from C terminal as the anterior position
-						ap = [atom[5],atom[6],atom[7]] #ap = anterior position, [float(Px),float(Py),float(Pz)]
-						for atom in self.proteinStruct[x+1]: #gets the coordinates from the next amino acid
-							if atom[2] == "N": #in this case, the Nitrogen is going to be the central atom
-								cp = [atom[5],atom[6],atom[7]] #cp = central position, [float(Px),float(Py),float(Pz)]
-							elif atom[2] == "2H":  #in this case, the Hydrogen bonded to Nitrogen is going to be the posterial atom
-							    ppH = [atom[5],atom[6],atom[7]] #pp = posteral position, [float(Px),float(Py),float(Pz)]
-							elif atom[2] == "CA": #in this case, the Alpha Carbon bonded to Nitrogen is going to be the posterial atom
-								ppCA = [atom[5],atom[6],atom[7]] #pp = posteral position, [float(Px),float(Py),float(Pz)]
-			elif (x==(self.seqSize-1)):
-				break
-			rotate = 120 - self.calcAngle3p(ap,cp,ppH)
-			print rotate
+		return math.degrees(float(np.arccos(res))),np.cross(v1,v2)
 
 
 
 	def getStructure (self):
 		return copy.deepcopy(self.proteinStruct)
 
-
-ProteinBuilder("YGGMF")
+ProteinBuilder("YG")

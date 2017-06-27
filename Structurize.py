@@ -6,9 +6,9 @@
 
 from ProteinBuilder import ProteinBuilder as buildProt
 
-seq = raw_input("Sequence: ") #Gets the aminoacids sequence
+seq = "YG" #raw_input("Sequence: ") #Gets the aminoacids sequence
 
-structure = builder.getStructure(buildProt(seq)) #Creates a structure vector
+structure = buildProt.getStructure(buildProt(seq)) #Creates a structure vector
 
 file = open(seq+".pdb","w") #Opens the output file
 
