@@ -6,7 +6,7 @@
 
 from ProteinBuilder import ProteinBuilder as buildProt
 
-seq = "YG" #raw_input("Sequence: ") #Gets the aminoacids sequence
+seq = "YGG" #raw_input("Sequence: ") #Gets the aminoacids sequence
 
 structure = buildProt.getStructure(buildProt(seq)) #Creates a structure vector
 

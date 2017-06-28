@@ -1,6 +1,6 @@
 from AADictBuilder import BuildDictionary as BD
 import copy
-from Rotational import getAngle
+from Rotational import getAngle as getAngle
 import numpy as np
 import math
 
@@ -56,6 +56,8 @@ class ProteinBuilder():
 		for x,atom in enumerate(structure[-1]):
 			if atom[2] in self.cabTAG:
 				paC = atom[5:8]
+			elif atom[2] in self.alphaC:
+				paCA = atom[5:8]
 		structure[-1] = self.removeOH(structure[-1])
 		aa = self.removeH(aa)
 		cont = 1
@@ -73,30 +75,37 @@ class ProteinBuilder():
 			elif atom[2] in self.nitro: #get the coordinates of H to rotate
 				ppN = atom[5:8]
 				N = x
+		
+		omega = getAngle.getAngle(getAngle(paCA,paC,ppN,ppCA))
+		torotate = 180. - omega
 
+		for x,atom in enumerate(aa[1:]):
+			if aa[x+1][2] not in self.angleH:
+				aa[x+1][5:8] =self.rotateOmega(torotate,aa[x+1][5:8],paC,ppN)
+		
 		angle = self.calcAngle3p(paC,ppN,ppH)
-		angH =  120 - angle[0] 
+		angH =  self.diff(120., angle[0]) 
 		ortho_aux = np.ndarray.tolist(angle[1])[0]
 		ortho = []
 		for item in ortho_aux:
 			ortho.append(round(item))
-		aa[H][5:8] = self.rotate(ortho,math.radians(angH),ppH,paC,ppN,ppH)
-		
+		aa[H][5:8] = self.rotate(ortho,angH,ppH,paC,ppN,ppH)
+
 		
 		angle = self.calcAngle3p(aa[H][5:8],ppN,ppCA)
-		angCA = 120- angle[0]
+		angCA = self.diff(120.,angle[0])
+		print angCA
 		ortho_aux = np.ndarray.tolist(angle[1])[0]
 		ortho = []
 		for item in ortho_aux:
 			ortho.append(round(item))
-		aa[CA][5:8] = self.rotate(ortho,math.radians(angCA),aa[CA][5:8],paC,ppN,ppCA)
-		print self.calcAngle3p(aa[CA][5:8],ppN,paC)[0]	
 		
-
-		for x,atom in enumerate(aa[2:]):
-			if aa[x+2][2] not in self.angleH:
-				aa[x+2][5:8] =self.rotate(ortho,math.radians(angCA),aa[x+2][5:8],paC,ppN,ppCA)
-	
+		for x,atom in enumerate(aa[1:]):
+			if aa[x+1][2] not in self.angleH:
+				print aa[x+1]
+				aa[x+1][5:8] = self.rotate(ortho,angCA,aa[x+1][5:8],paC,ppN,ppCA)
+				print aa[x+1]
+		
 		structure.append(aa)
 			
 	def setStructure(self):
@@ -111,9 +120,18 @@ class ProteinBuilder():
 				atom[1] = x
 				x = x +1
 
+	def diff(self,target, ang):
+		a = math.radians(target) - math.radians(ang)
+		if a > math.pi:
+			a -= math.pi *2.
+		if a < -math.pi:
+			a += math.pi *2.
+		return a
+
+
 	def rotate(self,ortho,ang,atm,at,ct,ps):
-		cos = math.cos(ang)
-		sen = math.sin(ang)
+		cos = np.cos(ang)
+		sen = np.sin(ang)
 		tan = 1.0-cos
 		pos = np.array(atm) - np.array(ct)
 		rot = np.matrix([[cos+ortho[0]*ortho[0]*tan, ortho[0] * ortho[1] * tan - ortho[2] * sen, ortho[0] * ortho[2] * tan + ortho[1] * sen],[ortho[0] * ortho[1] * tan + ortho[2] * sen, cos + ortho[1] * ortho[1] * tan, ortho[1] * ortho[2] * tan - ortho[0] * sen], [ortho[2] * ortho[0] * tan - ortho[1] * sen, ortho[2] * ortho[1] * tan + ortho[0] * sen, cos + ortho[2] * ortho[2] * tan]])
@@ -130,9 +148,16 @@ class ProteinBuilder():
 		v1n= v1/np.linalg.norm(v1)
 		v2n= v2/np.linalg.norm(v2)
 		res = np.sum(np.multiply(v1n,v2n))
-		return math.degrees(float(np.arccos(res))),np.cross(v1,v2)
+		return math.degrees(float(np.arccos(res))),np.cross(v1,v2)/np.linalg.norm(np.cross(v1,v2))
 
-
+	def rotateOmega(self,angle,atm,carb,nitro):
+		ang = math.radians(angle)
+		v = np.array(atm) - np.array(carb)
+		k = np.array(nitro) - np.array(carb)
+		k = k/np.linalg.norm(k)
+		v = v * np.cos(ang) + (np.cross(k,v))*np.sin(ang) + k*(np.dot(k,v)) *(1.0-np.cos(ang))
+		v = v + np.array(carb)
+		return list(v)
 
 	def getStructure (self):
 		return copy.deepcopy(self.proteinStruct)
