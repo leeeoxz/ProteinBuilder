@@ -42,3 +42,4 @@ class getAngle():
 
 	def getAngle(self):
 		return copy.deepcopy(self.angle)
+

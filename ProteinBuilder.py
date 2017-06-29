@@ -75,16 +75,12 @@ class ProteinBuilder():
 			elif atom[2] in self.nitro: #get the coordinates of H to rotate
 				ppN = atom[5:8]
 				N = x
-		
-		omega = getAngle.getAngle(getAngle(paCA,paC,ppN,ppCA))
-		torotate = 180. - omega
 
-		for x,atom in enumerate(aa[1:]):
-			if aa[x+1][2] not in self.angleH:
-				aa[x+1][5:8] =self.rotateOmega(torotate,aa[x+1][5:8],paC,ppN)
-		
 		angle = self.calcAngle3p(paC,ppN,ppH)
-		angH =  self.diff(120., angle[0]) 
+		angH =  self.diff(120., angle[0])
+		if angH > angle[0]:
+			angH = self.diff(120., -angle[0])
+ 
 		ortho_aux = np.ndarray.tolist(angle[1])[0]
 		ortho = []
 		for item in ortho_aux:
@@ -92,9 +88,11 @@ class ProteinBuilder():
 		aa[H][5:8] = self.rotate(ortho,angH,ppH,paC,ppN,ppH)
 
 		
-		angle = self.calcAngle3p(aa[H][5:8],ppN,ppCA)
+		angle = self.calcAngle3p(paC,ppN,ppCA)
 		angCA = self.diff(120.,angle[0])
-		print angCA
+		if angCA > angle[0]:
+			angCA = self.diff(120., -angle[0])
+
 		ortho_aux = np.ndarray.tolist(angle[1])[0]
 		ortho = []
 		for item in ortho_aux:
@@ -102,12 +100,19 @@ class ProteinBuilder():
 		
 		for x,atom in enumerate(aa[1:]):
 			if aa[x+1][2] not in self.angleH:
-				print aa[x+1]
 				aa[x+1][5:8] = self.rotate(ortho,angCA,aa[x+1][5:8],paC,ppN,ppCA)
-				print aa[x+1]
+		
+		omega = getAngle.getAngle(getAngle(paCA,paC,ppN,ppCA))
+		torotate = self.diff(180.,omega)
+		print torotate
+		#torotate = 180. - omega
+		for x,atom in enumerate(aa):
+			#print aa[x][5:8] 
+			aa[x][5:8] =self.rotateOmega(torotate,aa[x][5:8],paC,ppN)
+			#print aa[x][5:8]
 		
 		structure.append(aa)
-			
+
 	def setStructure(self):
 		for x,aa in enumerate(self.seq):
 			if not self.proteinStruct: #if proteinStructu is empty than its the first amino acid
@@ -151,7 +156,7 @@ class ProteinBuilder():
 		return math.degrees(float(np.arccos(res))),np.cross(v1,v2)/np.linalg.norm(np.cross(v1,v2))
 
 	def rotateOmega(self,angle,atm,carb,nitro):
-		ang = math.radians(angle)
+		ang = angle
 		v = np.array(atm) - np.array(carb)
 		k = np.array(nitro) - np.array(carb)
 		k = k/np.linalg.norm(k)
@@ -162,4 +167,4 @@ class ProteinBuilder():
 	def getStructure (self):
 		return copy.deepcopy(self.proteinStruct)
 
-ProteinBuilder("YG")
+ProteinBuilder("YGG")
