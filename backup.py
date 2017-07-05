@@ -88,16 +88,16 @@ def diff(target, ang):
 
 # TEM QUE MANDAR TODO O ATOMO, NAO SO AS COORDENADAS FUCK #
 
-file1=PDB_read("YGGFM.pdb") 
+file1=PDB_read("NLYIQWLKDGGPSSGRPPPS.pdb") 
 
 atoms1 = file1.getAtomsAA() # GET THE INFORMATIONS OF ALL ATOMS AS A LIST
-atoms2 = PDB_read("1plx.pdb").getAtomsAA() # GET THE INFORMATIONS OF ALL ATOMS AS A LIST
+#atoms2 = PDB_read("1plx.pdb").getAtomsAA() # GET THE INFORMATIONS OF ALL ATOMS AS A LIST
 coordAA1 =[]
 coordAA2 =[]
 for i in xrange(len(atoms1)):
 	coordAA1.append(file1.getCoord(atoms1[i]))
-for i in xrange(len(atoms2)):
-	coordAA2.append(PDB_read("1plx.pdb").getCoord(atoms2[i]))
+#for i in xrange(len(atoms2)):
+#	coordAA2.append(PDB_read("1plx.pdb").getCoord(atoms2[i]))
 
 tam = len(coordAA1) #GETS THE NUMBER OF AMINO ACIDS
 
@@ -108,8 +108,11 @@ anglesPHI = sm.create_solution()
 anglesPSI = sm.create_solution()
 
 #angles = zip(anglesPHI,anglesPSI)
-angles =  [[diff(math.radians(360.0),math.radians(360.0)),diff(math.radians(180.),math.radians(176.63))],[diff(math.radians(180.),math.radians(148.48)),diff(math.radians(180.),math.radians(-21.96))],[diff(math.radians(180.),math.radians(114.02)),diff(math.radians(180.),math.radians(29.89))],[diff(math.radians(180.),math.radians(-88.0)),diff(math.radians(180.),math.radians(-38.16))],[diff(math.radians(180.),math.radians(-74.24)),diff(math.radians(180.),math.radians(360.0))]]
-
+angles =  [[diff(math.radians(360.0),math.radians(360.0)),diff(math.radians(180.),math.radians(0.00))],[diff(math.radians(180.),math.radians(-172.67)),diff(math.radians(180.),math.radians(-62.14))],[diff(math.radians(180.),math.radians(-151.94)),diff(math.radians(180.),math.radians(180.00))],[diff(math.radians(180.),math.radians(132.87)),diff(math.radians(180.),math.radians(0.12))],[diff(math.radians(180.),math.radians(68.62)),diff(math.radians(180.),math.radians(0.01))],
+[diff(math.radians(180.),math.radians(-42.86)),diff(math.radians(180.),math.radians(-179.99))],[diff(math.radians(180.),math.radians(-8.77)),diff(math.radians(180.),math.radians(-62.07))],[diff(math.radians(180.),math.radians(74.85)),diff(math.radians(180.),math.radians(-179.98))],[diff(math.radians(180.),math.radians(122.09)),diff(math.radians(180.),math.radians(-178.84))],[diff(math.radians(180.),math.radians(88.06)),diff(math.radians(180.),math.radians(179.97))],
+[diff(math.radians(180.),math.radians(80.46)),diff(math.radians(180.),math.radians(-179.94))],[diff(math.radians(180.),math.radians(107.72)),diff(math.radians(180.),math.radians(179.94))],[diff(math.radians(180.),math.radians(116.51)),diff(math.radians(180.),math.radians(-179.99))],[diff(math.radians(180.),math.radians(99.99)),diff(math.radians(180.),math.radians(179.99))],[diff(math.radians(180.),math.radians(159.44)),diff(math.radians(180.),math.radians(179.99))],
+[diff(math.radians(180.),math.radians(66.67)),diff(math.radians(180.),math.radians(178.77))],[diff(math.radians(180.),math.radians(131.47)),diff(math.radians(180.),math.radians(179.98))],[diff(math.radians(180.),math.radians(-127.43)),diff(math.radians(180.),math.radians(179.97))],[diff(math.radians(180.),math.radians(-170.73)),diff(math.radians(180.),math.radians(-179.99))],[diff(math.radians(180.),math.radians(-7.24)),diff(math.radians(360.),math.radians(360.))],]
+print angles
 
 for x,aa in enumerate(atoms1):
 	if x == 0:
@@ -121,11 +124,15 @@ for x,aa in enumerate(atoms1):
 		atoms1 = atoms1[:x]+(psi(atoms1[x:],angles[x][1]))
 
 
-file = open("YGGFM.pdb","w") #Opens the output file
+file = open("1L2Y-P.pdb","w") #Opens the output file
 
 for aa in atoms1:
 	for atom in aa:
 		line = "{:6s}{:5d} {:^4s}{:1s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {:>2s}{:2s}".format(atom[0], atom[1], atom[2], " ", atom[3], " ", atom[4], " ", atom[5], atom[6], atom[7], atom[8], atom[9], " ", " ")
+		t = line[11:17]
+		a = atom[-1]
+		print a
+		line = line.replace(t,a)
 		file.write(line)
 		file.write("\n")
 file.write("TER")

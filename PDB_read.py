@@ -59,9 +59,9 @@ class PDB_read:
 		for line in self.content:
 			if self.atom in line[0:4]:
 				atm = line[11:17]
-				print atm
 				line = line.replace("\n","").split()
 				line = self.transforInt(line)
+				line.append(atm)
 				self.atomList.append(line)
 			elif self.endTag in line[0:3]:
 				break

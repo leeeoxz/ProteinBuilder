@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-name = "YGGFM.pdb" #raw_input("File name: ")
+name = "1L2Y-P.pdb" #raw_input("File name: ")
 f = pdbr(name)
 ca = f.getAlpha() #gets all Alpha Carbon
 n = f.getN() #Gets the N from backbone

@@ -182,7 +182,7 @@ n = 0
 m = []
 p = []
 while sm.getTemperature() > 1:
-	iterations = 100
+	iterations = 10
 	while iterations > 0:
 		ang = createAngles()
 		newTransRot = rotatephipsi(atoms1,ang)
@@ -206,11 +206,14 @@ while sm.getTemperature() > 1:
 	sm.updateTemperature()
 
 
-file = open("1PLX-F.pdb","w") #Opens the output file
+file = open("1L2Y-P.pdb","w") #Opens the output file
 
 for aa in bestst:
 	for atom in aa:
 		line = "{:6s}{:5d} {:^4s}{:1s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {:>2s}{:2s}".format(atom[0], atom[1], atom[2], " ", atom[3], " ", atom[4], " ", atom[5], atom[6], atom[7], atom[8], atom[9], " ", " ")
+		t = line[11:17]
+		a = atom[-1]
+		line = line.replace(t,a)
 		file.write(line)
 		file.write("\n")
 file.write("TER")

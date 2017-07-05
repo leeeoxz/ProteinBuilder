@@ -163,5 +163,3 @@ class ProteinBuilder():
 
 	def getStructure (self):
 		return copy.deepcopy(self.proteinStruct)
-
-ProteinBuilder("YGPG")
