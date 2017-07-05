@@ -76,40 +76,37 @@ class ProteinBuilder():
 				ppN = atom[5:8]
 				N = x
 
-		angle = self.calcAngle3p(paC,ppN,ppH)
-		angH =  self.diff(120., angle[0])
-		if angH > angle[0]:
-			angH = self.diff(120., -angle[0])
- 
-		ortho_aux = np.ndarray.tolist(angle[1])[0]
-		ortho = []
-		for item in ortho_aux:
-			ortho.append(round(item))
-		aa[H][5:8] = self.rotate(ortho,angH,ppH,paC,ppN,ppH)
+		if aa[0][3] != "PRO":
+			angle = self.calcAngle3p(paC,ppN,ppH)
+			angH =  self.diff(120., angle[0])
+			if angH > angle[0]:
+				angH = self.diff(120., -angle[0])
+	 
+			ortho_aux = np.ndarray.tolist(angle[1])[0]
+			ortho = []
+			for item in ortho_aux:
+				ortho.append(round(item))
+			aa[H][5:8] = self.rotate(ortho,angH,ppH,paC,ppN,ppH)
 
-		
-		angle = self.calcAngle3p(paC,ppN,ppCA)
-		angCA = self.diff(120.,angle[0])
-		if angCA > angle[0]:
-			angCA = self.diff(120., -angle[0])
+			
+			angle = self.calcAngle3p(paC,ppN,ppCA)
+			angCA = self.diff(120.,angle[0])
+			if angCA > angle[0]:
+				angCA = self.diff(120., -angle[0])
 
-		ortho_aux = np.ndarray.tolist(angle[1])[0]
-		ortho = []
-		for item in ortho_aux:
-			ortho.append(round(item))
-		
-		for x,atom in enumerate(aa[1:]):
-			if aa[x+1][2] not in self.angleH:
-				aa[x+1][5:8] = self.rotate(ortho,angCA,aa[x+1][5:8],paC,ppN,ppCA)
+			ortho_aux = np.ndarray.tolist(angle[1])[0]
+			ortho = []
+			for item in ortho_aux:
+				ortho.append(round(item))
+			
+			for x,atom in enumerate(aa[1:]):
+				if aa[x+1][2] not in self.angleH:
+					aa[x+1][5:8] = self.rotate(ortho,angCA,aa[x+1][5:8],paC,ppN,ppCA)
 		
 		omega = getAngle.getAngle(getAngle(paCA,paC,ppN,ppCA))
 		torotate = self.diff(180.,omega)
-		print torotate
-		#torotate = 180. - omega
 		for x,atom in enumerate(aa):
-			#print aa[x][5:8] 
 			aa[x][5:8] =self.rotateOmega(torotate,aa[x][5:8],paC,ppN)
-			#print aa[x][5:8]
 		
 		structure.append(aa)
 
@@ -167,4 +164,4 @@ class ProteinBuilder():
 	def getStructure (self):
 		return copy.deepcopy(self.proteinStruct)
 
-ProteinBuilder("YGG")
+ProteinBuilder("YGPG")

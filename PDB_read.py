@@ -58,6 +58,8 @@ class PDB_read:
 		self.atomList = []
 		for line in self.content:
 			if self.atom in line[0:4]:
+				atm = line[11:17]
+				print atm
 				line = line.replace("\n","").split()
 				line = self.transforInt(line)
 				self.atomList.append(line)
